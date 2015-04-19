@@ -2,10 +2,16 @@
   (:require
     [clj-http.client :as client]
     [deadbeat.slack.api :as api]
-    [deadbeat.slack.rtm :as rtm]))
+    [deadbeat.slack.rtm :as rtm]
+    [clojure.core.async :as a :refer [go chan <! >!]]))
 
 (def hardcode-token "...")
 
+(defn print-message [{:keys [user text]}]
+  (println (:name user) ": " text))
+
 (defn -main [& args]
   (let [rtm-connection (rtm/connect hardcode-token)]
-    (rtm/send-msg rtm-connection "general" "shut up sweet booby")))
+    (println "Connected to RTM!")
+    (rtm/on-message rtm-connection "general" print-message)
+    (println (read-line))))
